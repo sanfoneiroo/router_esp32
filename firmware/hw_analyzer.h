@@ -14,6 +14,10 @@ public:
     uint32_t getHeap();
     String getMac();
 
+    // ===== UPTIME =====
+    uint64_t getUptime();
+    String getUptimeString();
+
 private:
 
     float temperature = 0;
@@ -22,6 +26,9 @@ private:
     String macAddress = "";
 
     bool macCaptured = false;
+
+    // ===== UPTIME =====
+    uint64_t uptimeSeconds = 0;
 };
 
 #endif

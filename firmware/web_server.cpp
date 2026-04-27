@@ -40,13 +40,25 @@ void handleProvision()
 
 <form action="/connect" method="POST">
 
+<b>Rede externa (WAN)</b><br><br>
+
 SSID:<br>
 <input name="ssid"><br><br>
 
 Senha:<br>
 <input name="pass" type="password"><br><br>
 
-<input type="submit" value="Conectar">
+<hr>
+
+<b>Rede do roteador (AP)</b><br><br>
+
+SSID do roteador:<br>
+<input name="ap_ssid" value="ESP32_ROUTER"><br><br>
+
+Senha do roteador:<br>
+<input name="ap_pass" type="password" value="12345678"><br><br>
+
+<input type="submit" value="Salvar e Conectar">
 
 </form>
 
@@ -67,14 +79,36 @@ void handleConnect()
     String ssid = server.arg("ssid");
     String pass = server.arg("pass");
 
+    String ap_ssid = server.arg("ap_ssid");
+    String ap_pass = server.arg("ap_pass");
+
+    // valida senha do AP (mínimo 8 caracteres)
+    if(ap_pass.length() < 8)
+{
+    server.send(200,"text/html",
+    "<html>"
+    "<head>"
+    "<meta http-equiv='refresh' content='3;url=/' />"
+    "</head>"
+    "<body>"
+    "<h3>Senha precisa ter pelo menos 8 caracteres</h3>"
+    "<p>Voltando para config...</p>"
+    "</body>"
+    "</html>");
+    return;
+}
+
     webPrefs.begin("router", false);
 
     webPrefs.putString("ssid", ssid);
     webPrefs.putString("pass", pass);
 
+    webPrefs.putString("ap_ssid", ap_ssid);
+    webPrefs.putString("ap_pass", ap_pass);
+
     webPrefs.end();
 
-    server.send(200,"text/html","Salvo! Reiniciando...");
+    server.send(200,"text/html","Configuracao salva! Reiniciando...");
 
     delay(1000);
     ESP.restart();
@@ -128,7 +162,6 @@ document.getElementById("status").innerHTML = data;
 
 setInterval(updateStatus,2000);
 
-// BOTÃO WAN SEM POPUP
 function reconfigure(){
 
 fetch("/reconfigure");
@@ -207,16 +240,18 @@ void handleStatus()
     html += "IP publico: ";
     html += netPtr->getPublicIP();
     html += "<br>";
-
-    html += "<h2>Relogio</h2>";
-    html += "Hora: ";
+    html += "Data / Hora: ";
     html += netPtr->getTime();
     html += "<br>";
 
-    html += "<h2>Hardware</h2>";
+    html += "<h2>Status do Roteador</h2>";
 
     html += "MAC Router: ";
     html += hwPtr->getMac();
+    html += "<br>";
+
+    html += "Uptime: ";
+    html += hwPtr->getUptimeString();
     html += "<br>";
 
     html += "Temperatura: ";

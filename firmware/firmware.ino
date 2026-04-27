@@ -16,8 +16,14 @@ HwAnalyzer hwAnalyzer;
 WebServerModule web;
 
 // =====================================================
+//  Controle de temporização
+// =====================================================
+
+unsigned long lastUpdate = 0;
+const unsigned long updateInterval = 5000; // 5 segundos
+
+// =====================================================
 //  SETUP
-//  Inicializa todos os subsistemas do LabNode
 // =====================================================
 
 void setup()
@@ -34,23 +40,28 @@ void setup()
 
 // =====================================================
 //  LOOP PRINCIPAL
-//  Atualiza análise e interface de forma periódica
 // =====================================================
 
 void loop()
 {
-    // Atualiza estado da rede (clientes, RSSI, etc.)
-    netAnalyzer.update();
-
-    // Atualiza métricas de hardware (temp, heap)
-    hwAnalyzer.update();
-
-    // Mantém servidor web responsivo
+    // Mantém servidor web sempre responsivo
     web.update();
 
-    // Evita sobrecarga de CPU e rede
-    delay(5000);
+    unsigned long now = millis();
+
+    // Atualizações periódicas
+    if (now - lastUpdate >= updateInterval)
+    {
+        lastUpdate = now;
+
+        netAnalyzer.update();
+        hwAnalyzer.update();
+    }
 }
+
+// =====================================================
+//  FUNÇÃO DE DEBUG DO BOOT
+// =====================================================
 
 void printBootReport(NetAnalyzer* net)
 {

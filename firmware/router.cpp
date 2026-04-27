@@ -25,8 +25,9 @@ WebServerModule* webPtr;
 // CONFIG
 // =====================================================
 
-static const char* ap_ssid = "ESP32_ROUTER";
-static const char* ap_pass = "123Senha321";
+// valores padrão caso não exista configuração salva
+static String ap_ssid = "ESP32_ROUTER";
+static String ap_pass = "12345678";
 
 // NVS storage
 Preferences routerPrefs;
@@ -59,6 +60,9 @@ bool Router::configExists()
     sta_ssid = routerPrefs.getString("ssid", "");
     sta_pass = routerPrefs.getString("pass", "");
 
+    ap_ssid = routerPrefs.getString("ap_ssid", "ESP32_ROUTER");
+    ap_pass = routerPrefs.getString("ap_pass", "12345678");
+
     routerPrefs.end();
 
     return sta_ssid.length() > 0;
@@ -74,7 +78,10 @@ void Router::startAP()
 
     WiFi.mode(WIFI_AP_STA);
 
-    WiFi.softAP(ap_ssid, ap_pass);
+    WiFi.softAP(ap_ssid.c_str(), ap_pass.c_str());
+
+    Serial.print("AP SSID: ");
+    Serial.println(ap_ssid);
 
     Serial.print("AP IP: ");
     Serial.println(WiFi.softAPIP());

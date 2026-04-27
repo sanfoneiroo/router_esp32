@@ -9,10 +9,7 @@
 // =====================================================
 
 void HwAnalyzer::begin()
-{
-    // nada necessário aqui
-    // MAC será capturado automaticamente quando o AP estiver ativo
-}
+{}
 
 // =====================================================
 //  Atualiza métricas de hardware
@@ -47,6 +44,12 @@ void HwAnalyzer::update()
 
     heap = ESP.getFreeHeap();
 
+    // =================================================
+    // Uptime (segundos desde boot)
+    // =================================================
+
+    uptimeSeconds = millis() / 1000;
+
 #if SERIAL_MONITOR_ENABLED
 
     LOGLN("---- HARDWARE ----");
@@ -61,6 +64,9 @@ void HwAnalyzer::update()
     LOG("Heap livre: ");
     LOG(heap / 1024);
     LOGLN(" KB");
+
+    LOG("Uptime: ");
+    LOGLN(getUptimeString());
 
 #endif
 }
@@ -82,4 +88,48 @@ uint32_t HwAnalyzer::getHeap()
 String HwAnalyzer::getMac()
 {
     return macAddress;
+}
+
+uint64_t HwAnalyzer::getUptime()
+{
+    return uptimeSeconds;
+}
+
+// =====================================================
+//  Uptime formatado (d h m s)
+// =====================================================
+
+String HwAnalyzer::getUptimeString()
+{
+    uint64_t s = uptimeSeconds;
+
+    uint32_t days = s / 86400;
+    s %= 86400;
+
+    uint32_t hours = s / 3600;
+    s %= 3600;
+
+    uint32_t minutes = s / 60;
+    uint32_t seconds = s % 60;
+
+    String out = "";
+
+    if (days > 0)
+    {
+        out += String(days) + "d ";
+    }
+
+    if (hours > 0 || days > 0)
+    {
+        out += String(hours) + "h ";
+    }
+
+    if (minutes > 0 || hours > 0 || days > 0)
+    {
+        out += String(minutes) + "m ";
+    }
+
+    out += String(seconds) + "s";
+
+    return out;
 }
