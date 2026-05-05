@@ -177,9 +177,14 @@ void Router::begin(WebServerModule* web, NetAnalyzer* net, HwAnalyzer* hw)
 
     Serial.println("Inicializando router");
 
+    WiFi.mode(WIFI_AP_STA);  //  inicializa stack
+    delay(100);
+
+    bool hasConfig = configExists();
+
     startAP();
 
-    if (!configExists())
+    if (!hasConfig)
     {
         startProvisionPortal();
         return;
