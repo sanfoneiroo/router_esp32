@@ -36,7 +36,7 @@ void handleProvision()
 
 <body>
 
-<h1>Configurar Internet (WAN)</h1>
+<h1>Reconfigurar roteador</h1>
 
 <form action="/connect" method="POST">
 
@@ -115,7 +115,7 @@ void handleConnect()
 }
 
 // =====================================================
-// RESET WAN CONFIG
+// RESET CONFIG
 // =====================================================
 
 void handleReconfigure()
@@ -177,7 +177,7 @@ fetch("/reconfigure");
 <h1>ESP32 Router</h1>
 
 <button onclick="reconfigure()">
-Reconfigurar Internet (WAN)
+Reconfigurar Roteador
 </button>
 
 <hr>
